@@ -1,14 +1,13 @@
-import sys
-sys.path
 import mechanize
 import cookielib
 from bs4 import BeautifulSoup
 import re
 import io
-reload(sys);
+import sys
+import csv
+reload(sys)
 sys.setdefaultencoding("utf8")
 
-f=open('/Users/robinmalhotra2/Desktop/newfile 2.txt','w')
 # Browser
 br = mechanize.Browser()
 
@@ -30,21 +29,31 @@ br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 #br.set_debug_http(True)
 #br.set_debug_redirects(True)
 #br.set_debug_responses(True)
+for x in xrange(1,182):
+	preurl='http://eci.nic.in/archive/Dec2007/pollupd/ac/states/S06/Aconst'
+	if (x<10):
+		url=preurl+'0'+str(x)+'.htm'
+	else:
+		url=preurl+str(x)+'.htm'
+	r = br.open(url)
+	html = r.read()
+	html=br.response().read();
+	parsed_html = BeautifulSoup(html,'html.parser')
+	tableList=parsed_html.find_all('table')
+	bList=parsed_html.find_all('b')#insert KRK joke here
+	print bList[3].font.string
 
-# Open some site, let's pick a random one, the first that pops in mind:
+	#extract polling percentage
+	table1=tableList[1]
+	strongs2=table1.find_all('strong')
+	print strongs2[-1].string#gives last element
 
+	#extract lead
+	table2=tableList[2]
+	strongs=table2.find_all('strong')
+	print strongs[-4].string
+	print strongs[-1].string
 
-from selenium import webdriver
- 
-path_to_chromedriver = '/Users/robinmalhotra2/Desktop/chromedriver' # change path as needed
-browser = webdriver.Chrome(executable_path = path_to_chromedriver)
-
-url="http://eci.nic.in/archive/Dec2007/pollupd/ac/states/S06/a_index.htm"
-browser.get(url)
-elem=browser.swirch_to_active_element()
-f.write( elem.get_attribute('innerHTML'))
-# browser.find_element_by_xpath('/html/frameset/frameset')
-# browser.switch_to_frame('state_right_frame')
-# elem=browser.find_element_by_xpath('/html/body/div/table/tbody/tr[3]/td[2]')
-# f.write( elem.get_attribute('innerHTML'))
-driver.quit()
+	with open('eggs.csv', 'a') as csvfile:
+	    spamwriter = csv.writer(csvfile, dialect='excel',quoting=csv.QUOTE_ALL)
+	    spamwriter.writerow([bList[3].font.string,strongs2[-1].string,strongs[-4].string,strongs[-1].string,float(strongs[-1].string)/float(strongs[-4].string)])
